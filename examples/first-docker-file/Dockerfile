@@ -1,16 +1,21 @@
-FROM ubuntu:latest
+# Use Python base image
+FROM python:3.11-slim
 
-# Set the working directory in the image
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy the files from the host file system to the image file system
-COPY . /app
+# Copy requirements first (if you have one)
+# That way Docker can cache dependency installation
+COPY requirements.txt .
 
-# Install the necessary packages
-RUN apt-get update && apt-get install -y python3 python3-pip
+# Install dependencies
+RUN pip install -r requirements.txt
 
-# Set environment variables
-ENV NAME World
+# Copy the rest of the project (including app.py) into /app
+COPY . .
 
-# Run a command to start the application
-CMD ["python3", "app.py"]
+# Expose the Flask port
+EXPOSE 5000
+
+# Run your app
+CMD ["python", "app.py"]
